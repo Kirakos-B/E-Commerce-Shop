@@ -11,6 +11,8 @@ import authRoutes from "./routes/authRoutes";
 import productRoutes from "./routes/productRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import customOrderRoutes from "./routes/customOrderRoutes";
+import feedbackRoutes from "./routes/feedbackRoutes";
+import postRoutes from "./routes/postRoutes";
 import errorMiddleware from "./middleware/errorMiddleware";
 
 connectDB();
@@ -28,6 +30,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/custom-orders", customOrderRoutes);
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/posts", postRoutes);
 
 // Health check
 app.get("/", (req, res) => {

@@ -155,3 +155,25 @@ export interface ICustomOrder extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IFeedback extends Document {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  product?: Types.ObjectId;
+  order?: Types.ObjectId;
+  rating: number;
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IPost extends Document {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  caption: string;
+  images: string[];
+  likes: Types.ObjectId[];
+  isApproved: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
