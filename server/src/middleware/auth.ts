@@ -61,3 +61,37 @@ export const adminOnly = (
   }
   next();
 };
+
+// Optional auth — attaches user if token exists, but doesn't block if not
+export const optionalProtect = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    let token: string | undefined;
+
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies?.token) {
+      token = req.cookies.token;
+    }
+
+    if (!token) return next(); // no token — continue as guest
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string,
+    ) as JwtPayload;
+
+    const user = await User.findById(decoded.id).select("-password");
+    if (user) req.user = user;
+
+    next();
+  } catch {
+    next(); // invalid token — continue as guest silently
+  }
+};

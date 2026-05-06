@@ -8,6 +8,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
+import productRoutes from "./routes/productRoutes";
+import orderRoutes from "./routes/orderRoutes";
+import customOrderRoutes from "./routes/customOrderRoutes";
 import errorMiddleware from "./middleware/errorMiddleware";
 
 connectDB();
@@ -22,6 +25,9 @@ app.use(cookieParser());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/custom-orders", customOrderRoutes);
 
 // Health check
 app.get("/", (req, res) => {
