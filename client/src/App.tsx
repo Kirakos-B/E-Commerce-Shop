@@ -4,14 +4,11 @@ import AdminLayout from "./components/layout/AdminLayout";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import Login from "./pages/user/Login";
 import Register from "./pages/user/Register";
+import Home from "./pages/user/Home";
+import Shop from "./pages/user/Shop";
+import ProductDetail from "./pages/user/ProductDetail";
 
 // Placeholders
-const Home = () => (
-  <div className="p-8 font-serif text-2xl text-primary">🦅 Home Page</div>
-);
-const Shop = () => (
-  <div className="p-8 font-serif text-2xl text-primary">🛍️ Shop Page</div>
-);
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
 );
@@ -25,7 +22,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes — with Navbar + Footer */}
+        {/* Public routes */}
         <Route
           path="/"
           element={
@@ -39,6 +36,14 @@ function App() {
           element={
             <MainLayout>
               <Shop />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/shop/:id"
+          element={
+            <MainLayout>
+              <ProductDetail />
             </MainLayout>
           }
         />
@@ -59,7 +64,7 @@ function App() {
           }
         />
 
-        {/* Admin routes — with sidebar layout */}
+        {/* Admin routes */}
         <Route
           path="/admin/dashboard"
           element={
