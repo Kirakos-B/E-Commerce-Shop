@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
+import connectCloudinary from "./config/cloudinary";
+
 import path from "path";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
+connectCloudinary();
 
 import express from "express";
 import cors from "cors";
@@ -13,7 +16,9 @@ import orderRoutes from "./routes/orderRoutes";
 import customOrderRoutes from "./routes/customOrderRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
 import postRoutes from "./routes/postRoutes";
+import adminRoutes from "./routes/adminRoutes";
 import errorMiddleware from "./middleware/errorMiddleware";
+import uploadRoutes from "./routes/uploadRoutes";
 
 connectDB();
 
@@ -24,6 +29,7 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use("/api/upload", uploadRoutes);
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -32,6 +38,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/custom-orders", customOrderRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Health check
 app.get("/", (req, res) => {

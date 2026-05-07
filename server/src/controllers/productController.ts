@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Product from "../models/Product";
 import { AppError } from "../utils/errorHandler";
+import { deleteFromCloudinary } from "../utils/uploadToCloudinary";
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -143,17 +144,26 @@ export const updateProduct = async (
 // @desc    Delete product
 // @route   DELETE /api/products/:id
 // @access  Admin
+
+// @desc    Delete product
 export const deleteProduct = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
 
     if (!product) {
       return next(new AppError("Product not found", 404));
     }
+
+    // Delete images from Cloudinary
+    if (product.images && product.images.length > 0) {
+      await Promise.all(product.images.map((img) => deleteFromCloudinary(img)));
+    }
+
+    await product.deleteOne();
 
     res
       .status(200)
