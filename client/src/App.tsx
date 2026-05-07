@@ -7,8 +7,10 @@ import Register from "./pages/user/Register";
 import Home from "./pages/user/Home";
 import Shop from "./pages/user/Shop";
 import ProductDetail from "./pages/user/ProductDetail";
+import Cart from "./pages/user/Cart";
+import Checkout from "./pages/user/Checkout";
+import OrderConfirmation from "./pages/user/OrderConfirmation";
 
-// Placeholders
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
 );
@@ -47,8 +49,36 @@ function App() {
             </MainLayout>
           }
         />
+        <Route
+          path="/cart"
+          element={
+            <MainLayout>
+              <Cart />
+            </MainLayout>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Checkout — public (guest + user) */}
+        <Route
+          path="/checkout"
+          element={
+            <MainLayout>
+              <Checkout />
+            </MainLayout>
+          }
+        />
+
+        {/* Order confirmation — accessible after order */}
+        <Route
+          path="/order-confirmation/:id"
+          element={
+            <MainLayout>
+              <OrderConfirmation />
+            </MainLayout>
+          }
+        />
 
         {/* Protected user routes */}
         <Route
@@ -58,6 +88,18 @@ function App() {
               <MainLayout>
                 <div className="p-8 font-serif text-2xl text-primary">
                   👤 Profile
+                </div>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <div className="p-8 font-serif text-2xl text-primary">
+                  📦 My Orders
                 </div>
               </MainLayout>
             </ProtectedRoute>
