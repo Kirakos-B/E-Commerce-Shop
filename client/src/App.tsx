@@ -1,27 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MainLayout from "./components/layout/MainLayout";
+import AdminLayout from "./components/layout/AdminLayout";
+import ProtectedRoute from "./components/shared/ProtectedRoute";
 import Login from "./pages/user/Login";
 import Register from "./pages/user/Register";
-import ProtectedRoute from "./components/shared/ProtectedRoute";
 
-// Placeholder pages
+// Placeholders
 const Home = () => (
-  <div className="min-h-screen bg-secondary flex items-center justify-center">
-    <h1 className="text-4xl font-serif text-primary">🦅 Home Page</h1>
-  </div>
+  <div className="p-8 font-serif text-2xl text-primary">🦅 Home Page</div>
 );
-
 const Shop = () => (
-  <div className="min-h-screen bg-secondary flex items-center justify-center">
-    <h1 className="text-4xl font-serif text-primary">🛍️ Shop Page</h1>
-  </div>
+  <div className="p-8 font-serif text-2xl text-primary">🛍️ Shop Page</div>
 );
-
 const Dashboard = () => (
-  <div className="min-h-screen bg-secondary flex items-center justify-center">
-    <h1 className="text-4xl font-serif text-primary">📊 Admin Dashboard</h1>
-  </div>
+  <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
 );
-
 const NotFound = () => (
   <div className="min-h-screen bg-secondary flex items-center justify-center">
     <h1 className="text-4xl font-serif text-primary">404 — Page Not Found</h1>
@@ -32,9 +25,23 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/shop" element={<Shop />} />
+        {/* Public routes — with Navbar + Footer */}
+        <Route
+          path="/"
+          element={
+            <MainLayout>
+              <Home />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/shop"
+          element={
+            <MainLayout>
+              <Shop />
+            </MainLayout>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -43,19 +50,23 @@ function App() {
           path="/profile"
           element={
             <ProtectedRoute>
-              <div className="p-8 font-serif text-2xl text-primary">
-                👤 Profile Page
-              </div>
+              <MainLayout>
+                <div className="p-8 font-serif text-2xl text-primary">
+                  👤 Profile
+                </div>
+              </MainLayout>
             </ProtectedRoute>
           }
         />
 
-        {/* Admin only routes */}
+        {/* Admin routes — with sidebar layout */}
         <Route
           path="/admin/dashboard"
           element={
             <ProtectedRoute adminOnly>
-              <Dashboard />
+              <AdminLayout>
+                <Dashboard />
+              </AdminLayout>
             </ProtectedRoute>
           }
         />
