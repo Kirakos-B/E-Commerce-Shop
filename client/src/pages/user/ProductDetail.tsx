@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShoppingCart, Star, ArrowLeft, Package } from "lucide-react";
+import { ShoppingCart, Star, ArrowLeft, Package, Send } from "lucide-react";
 import { getProduct } from "../../services/productService";
+import {
+  getProductFeedback,
+  createFeedback,
+} from "../../services/feedbackService";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import Spinner from "../../components/shared/Spinner";
-import type { Product } from "../../types";
+import type { Product, Feedback } from "../../types";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +19,15 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(true);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [hoverRating, setHoverRating] = useState(0);
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
+  const [feedbackSuccess, setFeedbackSuccess] = useState("");
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -29,11 +43,52 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      if (!id) return;
+      try {
+        const data = await getProductFeedback(id);
+        setFeedback(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setFeedbackLoading(false);
+      }
+    };
+    fetchFeedback();
+  }, [id]);
+
   const handleAddToCart = () => {
     if (!product) return;
     addToCart(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  };
+
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!comment.trim()) return;
+    setSubmittingFeedback(true);
+    setFeedbackError("");
+    try {
+      const newFeedback = await createFeedback({
+        product: id!,
+        rating,
+        comment,
+      });
+      setFeedback((prev) => [newFeedback, ...prev]);
+      setComment("");
+      setRating(5);
+      setFeedbackSuccess("Review submitted successfully!");
+      setTimeout(() => setFeedbackSuccess(""), 3000);
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Failed to submit review.";
+      setFeedbackError(message);
+    } finally {
+      setSubmittingFeedback(false);
+    }
   };
 
   if (loading) {
@@ -214,6 +269,126 @@ const ProductDetail = () => {
             </Link>
           </div>
         </div>
+      </div>
+      {/* Reviews Section */}
+      <div className="mt-16 max-w-3xl">
+        <h2 className="font-serif text-2xl font-bold text-primary mb-8">
+          Customer Reviews
+          {feedback.length > 0 && (
+            <span className="text-primary/50 text-lg font-normal ml-2">
+              ({feedback.length})
+            </span>
+          )}
+        </h2>
+
+        {/* Write a Review */}
+        {isAuthenticated ? (
+          <form onSubmit={handleFeedbackSubmit} className="card p-6 mb-8">
+            <h3 className="font-semibold text-primary mb-4">Write a Review</h3>
+
+            {/* Star Rating */}
+            <div className="flex gap-1 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => setRating(star)}
+                >
+                  <Star
+                    size={28}
+                    className={
+                      star <= (hoverRating || rating)
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-primary/20"
+                    }
+                  />
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              className="input-field resize-none h-24 mb-3"
+              placeholder="Share your experience with this product..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              required
+            />
+
+            {feedbackError && (
+              <p className="text-red-500 text-sm mb-3">{feedbackError}</p>
+            )}
+            {feedbackSuccess && (
+              <p className="text-green-600 text-sm mb-3">{feedbackSuccess}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={submittingFeedback}
+              className="btn-primary flex items-center gap-2"
+            >
+              {submittingFeedback ? <Spinner size="sm" /> : <Send size={16} />}
+              {submittingFeedback ? "Submitting..." : "Submit Review"}
+            </button>
+          </form>
+        ) : (
+          <div className="card p-6 mb-8 text-center">
+            <p className="text-primary/60 mb-3">Sign in to leave a review</p>
+            <Link to="/login" className="btn-primary inline-block">
+              Sign In
+            </Link>
+          </div>
+        )}
+
+        {/* Reviews List */}
+        {feedbackLoading ? (
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
+        ) : feedback.length === 0 ? (
+          <p className="text-primary/50 text-center py-8">
+            No reviews yet. Be the first to review!
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {feedback.map((f) => (
+              <div key={f._id} className="card p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-primary text-secondary flex items-center justify-center font-bold text-sm">
+                      {f.user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-medium text-primary text-sm">
+                        {f.user.name}
+                      </p>
+                      <p className="text-xs text-primary/40">
+                        {new Date(f.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={14}
+                        className={
+                          star <= f.rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-primary/20"
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-primary/70 text-sm leading-relaxed">
+                  {f.comment}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

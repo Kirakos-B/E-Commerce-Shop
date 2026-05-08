@@ -15,6 +15,7 @@ import CustomOrderConfirmation from "./pages/user/CustomOrderConfirmation";
 import Profile from "./pages/user/Profile";
 import MyOrders from "./pages/user/MyOrders";
 import OrderDetail from "./pages/user/OrderDetail";
+import Community from "./pages/user/Community";
 
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
@@ -135,6 +136,14 @@ function App() {
                 <OrderDetail />
               </MainLayout>
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/posts"
+          element={
+            <MainLayout>
+              <Community />
+            </MainLayout>
           }
         />
 
