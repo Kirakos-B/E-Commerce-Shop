@@ -10,6 +10,8 @@ import ProductDetail from "./pages/user/ProductDetail";
 import Cart from "./pages/user/Cart";
 import Checkout from "./pages/user/Checkout";
 import OrderConfirmation from "./pages/user/OrderConfirmation";
+import CustomOrder from "./pages/user/CustomOrder";
+import CustomOrderConfirmation from "./pages/user/CustomOrderConfirmation";
 
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
@@ -115,6 +117,22 @@ function App() {
                 <Dashboard />
               </AdminLayout>
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/custom-order"
+          element={
+            <MainLayout>
+              <CustomOrder />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/custom-order/confirmation/:id"
+          element={
+            <MainLayout>
+              <CustomOrderConfirmation />
+            </MainLayout>
           }
         />
 
