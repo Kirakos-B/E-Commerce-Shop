@@ -16,6 +16,7 @@ import Profile from "./pages/user/Profile";
 import MyOrders from "./pages/user/MyOrders";
 import OrderDetail from "./pages/user/OrderDetail";
 import Community from "./pages/user/Community";
+import AdminDashboard from "./pages/admin/Dashboard";
 
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
@@ -94,7 +95,7 @@ function App() {
           element={
             <ProtectedRoute adminOnly>
               <AdminLayout>
-                <Dashboard />
+                <AdminDashboard />
               </AdminLayout>
             </ProtectedRoute>
           }
