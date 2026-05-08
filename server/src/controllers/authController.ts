@@ -101,3 +101,62 @@ export const getMe = async (
     next(error);
   }
 };
+
+// @desc    Update profile
+// @route   PUT /api/auth/me
+// @access  Private
+export const updateProfile = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { name, phone, address, sizes } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      { name, phone, address, sizes },
+      { new: true, runValidators: true },
+    );
+
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update password
+// @route   PUT /api/auth/password
+// @access  Private
+export const updatePassword = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user?._id).select("+password");
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return next(new AppError("Current password is incorrect", 401));
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

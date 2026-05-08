@@ -12,6 +12,9 @@ import Checkout from "./pages/user/Checkout";
 import OrderConfirmation from "./pages/user/OrderConfirmation";
 import CustomOrder from "./pages/user/CustomOrder";
 import CustomOrderConfirmation from "./pages/user/CustomOrderConfirmation";
+import Profile from "./pages/user/Profile";
+import MyOrders from "./pages/user/MyOrders";
+import OrderDetail from "./pages/user/OrderDetail";
 
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
@@ -83,30 +86,6 @@ function App() {
         />
 
         {/* Protected user routes */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <div className="p-8 font-serif text-2xl text-primary">
-                  👤 Profile
-                </div>
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-orders"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <div className="p-8 font-serif text-2xl text-primary">
-                  📦 My Orders
-                </div>
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
 
         {/* Admin routes */}
         <Route
@@ -127,12 +106,35 @@ function App() {
             </MainLayout>
           }
         />
+
         <Route
-          path="/custom-order/confirmation/:id"
+          path="/profile"
           element={
-            <MainLayout>
-              <CustomOrderConfirmation />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <Profile />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <MyOrders />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-orders/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <OrderDetail />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
 
