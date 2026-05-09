@@ -17,6 +17,12 @@ import MyOrders from "./pages/user/MyOrders";
 import OrderDetail from "./pages/user/OrderDetail";
 import Community from "./pages/user/Community";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminCustomOrders from "./pages/admin/AdminCustomOrders";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminFeedback from "./pages/admin/AdminFeedback";
+import AdminPosts from "./pages/admin/AdminPosts";
 
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
@@ -96,6 +102,66 @@ function App() {
             <ProtectedRoute adminOnly>
               <AdminLayout>
                 <AdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/products"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout>
+                <AdminProducts />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout>
+                <AdminOrders />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/custom-orders"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout>
+                <AdminCustomOrders />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout>
+                <AdminUsers />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/feedback"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout>
+                <AdminFeedback />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/posts"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout>
+                <AdminPosts />
               </AdminLayout>
             </ProtectedRoute>
           }
