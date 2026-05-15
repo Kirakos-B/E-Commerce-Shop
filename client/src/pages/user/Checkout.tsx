@@ -17,10 +17,10 @@ const Checkout = () => {
   const [error, setError] = useState("");
 
   // Shipping
+  const [country, setCountry] = useState("Ethiopia");
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [country, setCountry] = useState("");
   const [zip, setZip] = useState("");
   const [notes, setNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
@@ -143,17 +143,17 @@ const Checkout = () => {
             {/* Shipping Address */}
             <div className="card p-6">
               <h2 className="font-serif text-xl font-bold text-primary mb-4">
-                Shipping Address
+                Delivery Address
               </h2>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-primary mb-1">
-                    Street Address
+                    Sub-city / Street Address
                   </label>
                   <input
                     type="text"
                     className="input-field"
-                    placeholder="123 Main Street"
+                    placeholder="e.g. Bole, Near Edna Mall"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
                     required
@@ -167,7 +167,7 @@ const Checkout = () => {
                     <input
                       type="text"
                       className="input-field"
-                      placeholder="Addis Ababa"
+                      placeholder="e.g. Addis Ababa"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       required
@@ -175,16 +175,29 @@ const Checkout = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-primary mb-1">
-                      State / Region
+                      Region
                     </label>
-                    <input
-                      type="text"
+                    <select
                       className="input-field"
-                      placeholder="AA"
                       value={state}
                       onChange={(e) => setState(e.target.value)}
                       required
-                    />
+                    >
+                      <option value="">Select region...</option>
+                      <option>Addis Ababa</option>
+                      <option>Afar</option>
+                      <option>Amhara</option>
+                      <option>Benishangul-Gumuz</option>
+                      <option>Dire Dawa</option>
+                      <option>Gambela</option>
+                      <option>Harari</option>
+                      <option>Oromia</option>
+                      <option>Sidama</option>
+                      <option>Somali</option>
+                      <option>South Ethiopia</option>
+                      <option>SNNPR</option>
+                      <option>Tigray</option>
+                    </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -195,7 +208,6 @@ const Checkout = () => {
                     <input
                       type="text"
                       className="input-field"
-                      placeholder="Ethiopia"
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
                       required
@@ -203,15 +215,17 @@ const Checkout = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-primary mb-1">
-                      ZIP / Postal Code
+                      Postal Code
+                      <span className="text-primary/40 font-normal ml-1">
+                        (optional)
+                      </span>
                     </label>
                     <input
                       type="text"
                       className="input-field"
-                      placeholder="1000"
+                      placeholder="e.g. 1000"
                       value={zip}
                       onChange={(e) => setZip(e.target.value)}
-                      required
                     />
                   </div>
                 </div>
@@ -223,27 +237,60 @@ const Checkout = () => {
               <h2 className="font-serif text-xl font-bold text-primary mb-4">
                 Payment Method
               </h2>
-              <div className="grid grid-cols-3 gap-3">
-                {(["cash", "card", "transfer"] as PaymentMethod[]).map(
-                  (method) => (
-                    <button
-                      key={method}
-                      type="button"
-                      onClick={() => setPaymentMethod(method)}
-                      className={`p-4 rounded-xl border-2 text-sm font-medium capitalize transition-colors ${
-                        paymentMethod === method
-                          ? "border-primary bg-primary text-secondary"
-                          : "border-secondary-dark text-primary hover:border-primary"
-                      }`}
-                    >
-                      {method === "cash" && "💵 "}
-                      {method === "card" && "💳 "}
-                      {method === "transfer" && "🏦 "}
-                      {method}
-                    </button>
-                  ),
-                )}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { value: "cash", label: "Cash on Delivery", emoji: "💵" },
+                  { value: "transfer", label: "Bank Transfer", emoji: "🏦" },
+                  { value: "card", label: "Card", emoji: "💳" },
+                ].map((method) => (
+                  <button
+                    key={method.value}
+                    type="button"
+                    onClick={() =>
+                      setPaymentMethod(method.value as PaymentMethod)
+                    }
+                    className={`p-4 rounded-xl border-2 text-sm font-medium transition-colors text-left ${
+                      paymentMethod === method.value
+                        ? "border-primary bg-primary text-secondary"
+                        : "border-secondary-dark text-primary hover:border-primary"
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{method.emoji}</div>
+                    <div>{method.label}</div>
+                  </button>
+                ))}
               </div>
+
+              {/* Bank transfer instructions */}
+              {paymentMethod === "transfer" && (
+                <div className="mt-4 bg-secondary rounded-xl p-4 border border-secondary-dark text-sm">
+                  <p className="font-medium text-primary mb-2">
+                    🏦 Bank Transfer Details
+                  </p>
+                  <div className="space-y-1 text-primary/70">
+                    <p>
+                      Bank:{" "}
+                      <span className="font-medium text-primary">
+                        Commercial Bank of Ethiopia
+                      </span>
+                    </p>
+                    <p>
+                      Account Name:{" "}
+                      <span className="font-medium text-primary">Emu Shop</span>
+                    </p>
+                    <p>
+                      Account Number:{" "}
+                      <span className="font-medium text-primary">
+                        1000123456789
+                      </span>
+                    </p>
+                    <p className="mt-2 text-xs text-primary/50">
+                      Please use your order ID as the transfer reference. Your
+                      order will be confirmed after payment verification.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Notes */}
@@ -289,6 +336,10 @@ const Checkout = () => {
                 <span>Total</span>
                 <span>${totalPrice.toFixed(2)}</span>
               </div>
+              <p className="text-xs text-primary/40 mb-6">
+                Prices shown in USD. Payment accepted in ETB at current exchange
+                rate.
+              </p>
 
               <p className="text-xs text-primary/50 mb-6">
                 Payment via:{" "}
