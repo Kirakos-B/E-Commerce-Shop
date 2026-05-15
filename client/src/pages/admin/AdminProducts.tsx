@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import {
   createProductAdmin,
@@ -7,8 +7,9 @@ import {
 } from "../../services/adminService";
 import { getProducts } from "../../services/productService";
 import Spinner from "../../components/shared/Spinner";
-import { Plus, Pencil, Trash2, X, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Package, Upload } from "lucide-react";
 import type { Product, ProductCategory } from "../../types";
+import api from "../../services/api";
 
 const categories: ProductCategory[] = [
   "suits",
@@ -27,7 +28,6 @@ const emptyForm = {
   price: "",
   category: "suits" as ProductCategory,
   stock: "",
-  images: "",
   isFeatured: false,
 };
 
@@ -39,6 +39,11 @@ const AdminProducts = () => {
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Image upload state
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchProducts = async () => {
     try {
@@ -58,6 +63,7 @@ const AdminProducts = () => {
   const openCreate = () => {
     setEditingProduct(null);
     setForm(emptyForm);
+    setImageUrls([]);
     setError("");
     setShowForm(true);
   };
@@ -70,11 +76,42 @@ const AdminProducts = () => {
       price: String(product.price),
       category: product.category,
       stock: String(product.stock),
-      images: product.images.join(", "),
       isFeatured: product.isFeatured,
     });
+    setImageUrls(product.images || []);
     setError("");
     setShowForm(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const { data } = await api.post(
+        "/upload/multiple?folder=products",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+
+      const newUrls = data.urls.map((u: { url: string }) => u.url);
+      setImageUrls((prev) => [...prev, ...newUrls]);
+    } catch (err) {
+      console.error("Upload failed", err);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setImageUrls((prev) => prev.filter((u) => u !== url));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -88,12 +125,7 @@ const AdminProducts = () => {
         price: Number(form.price),
         category: form.category,
         stock: Number(form.stock),
-        images: form.images
-          ? form.images
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-          : [],
+        images: imageUrls,
         isFeatured: form.isFeatured,
       };
 
@@ -162,6 +194,7 @@ const AdminProducts = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-primary mb-1">
                   Product Name
@@ -175,6 +208,7 @@ const AdminProducts = () => {
                 />
               </div>
 
+              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-primary mb-1">
                   Description
@@ -189,6 +223,7 @@ const AdminProducts = () => {
                 />
               </div>
 
+              {/* Price + Stock */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-primary mb-1">
@@ -223,6 +258,7 @@ const AdminProducts = () => {
                 </div>
               </div>
 
+              {/* Category */}
               <div>
                 <label className="block text-sm font-medium text-primary mb-1">
                   Category
@@ -245,22 +281,63 @@ const AdminProducts = () => {
                 </select>
               </div>
 
+              {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium text-primary mb-1">
-                  Image URLs
-                  <span className="text-primary/40 font-normal ml-1">
-                    (comma separated)
-                  </span>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Product Images
                 </label>
+
+                {/* Image previews */}
+                {imageUrls.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {imageUrls.map((url) => (
+                      <div
+                        key={url}
+                        className="relative w-20 h-20 rounded-lg overflow-hidden border border-secondary-dark group"
+                      >
+                        <img
+                          src={url}
+                          alt="product"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(url)}
+                          className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Hidden file input */}
                 <input
-                  type="text"
-                  className="input-field"
-                  placeholder="https://..., https://..."
-                  value={form.images}
-                  onChange={(e) => setForm({ ...form, images: e.target.value })}
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
                 />
+
+                {/* Upload button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? <Spinner size="sm" /> : <Upload size={16} />}
+                  {uploading ? "Uploading..." : "Upload Images"}
+                </button>
+                <p className="text-xs text-primary/40 mt-1">
+                  JPEG, PNG or WebP — max 5MB each. Multiple files supported.
+                </p>
               </div>
 
+              {/* Featured */}
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -281,6 +358,7 @@ const AdminProducts = () => {
 
               {error && <p className="text-red-500 text-sm">{error}</p>}
 
+              {/* Submit */}
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"

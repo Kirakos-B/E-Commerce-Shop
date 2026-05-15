@@ -23,6 +23,8 @@ import AdminCustomOrders from "./pages/admin/AdminCustomOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminFeedback from "./pages/admin/AdminFeedback";
 import AdminPosts from "./pages/admin/AdminPosts";
+import MyCustomOrders from "./pages/user/MyCustomOrders";
+import AdminStats from "./pages/admin/AdminStats";
 
 const Dashboard = () => (
   <div className="font-serif text-2xl text-primary">📊 Dashboard</div>
@@ -211,6 +213,26 @@ function App() {
             <MainLayout>
               <Community />
             </MainLayout>
+          }
+        />
+        <Route
+          path="/my-custom-orders"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <MyCustomOrders />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/stats"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminLayout>
+                <AdminStats />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
 

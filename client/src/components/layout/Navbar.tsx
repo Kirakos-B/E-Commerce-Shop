@@ -9,6 +9,7 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  Scissors,
 } from "lucide-react";
 
 const Navbar = () => {
@@ -98,6 +99,13 @@ const Navbar = () => {
                       className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-secondary transition-colors"
                     >
                       <ShoppingCart size={16} /> My Orders
+                    </Link>
+                    <Link
+                      to="/my-custom-orders"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-secondary transition-colors"
+                    >
+                      <Scissors size={16} /> Custom Orders
                     </Link>
                     {isAdmin && (
                       <Link
@@ -195,6 +203,13 @@ const Navbar = () => {
                 className="block py-2 hover:text-secondary/70"
               >
                 My Orders
+              </Link>
+              <Link
+                to="/my-custom-orders"
+                onClick={() => setMenuOpen(false)}
+                className="block py-2 hover:text-secondary/70"
+              >
+                Custom Orders
               </Link>
               {isAdmin && (
                 <Link
