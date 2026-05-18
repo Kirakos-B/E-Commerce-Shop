@@ -19,6 +19,7 @@ import postRoutes from "./routes/postRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import errorMiddleware from "./middleware/errorMiddleware";
 import uploadRoutes from "./routes/uploadRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
 
 connectDB();
 
@@ -39,6 +40,7 @@ app.use("/api/custom-orders", customOrderRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // Health check
 app.get("/", (req, res) => {
